@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
+import envConfig from "@/config"
 
  
 
@@ -28,14 +29,22 @@ export default function RegisterForm() {
       })
      
       // 2. Define a submit handler.
-      function onSubmit(values: RegisterBodyType) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+      async function onSubmit(values: RegisterBodyType) {
+          const result = await fetch(
+            `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
+            {
+              body: JSON.stringify(values),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              method: 'POST'
+            }
+          ).then(res => res.json())
+          console.log('>>>>',result)
       }
       return (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-[600px]">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-[600px] w-full" noValidate>
             <FormField
               control={form.control}
               name="name"
@@ -88,7 +97,7 @@ export default function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
+            <Button type="submit" className="!mt-6 w-full">Submit</Button>
           </form>
         </Form>
       )
