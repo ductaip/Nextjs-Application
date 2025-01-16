@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import plugin from 'tailwindcss/plugin'
 
 export default {
     darkMode: ["class"],
@@ -56,7 +60,20 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		}
-  	}
+	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+	tailwindcssAnimate,
+	plugin(function ({ addComponents, theme }) {
+		addComponents({
+		  '.container': {
+			maxWidth: theme('columns.7xl'),
+			marginLeft: 'auto',
+			marginRight: 'auto',
+			paddingLeft: theme('spacing.4'),
+			paddingRight: theme('spacing.4')
+		  }
+		})
+	  })
+	],
 } satisfies Config;

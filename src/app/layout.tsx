@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>  
       <body
-        className={`${inter.className}`}
+        className={`${inter.className} container`}
       >
           <ThemeProvider
             attribute="class"
