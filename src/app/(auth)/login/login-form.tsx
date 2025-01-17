@@ -14,10 +14,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import envConfig from "@/config"
-
+import { useToast } from "@/hooks/use-toast"
  
 
 export default function LoginForm() {
+    const { toast } = useToast()
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
         defaultValues: {
@@ -28,17 +29,43 @@ export default function LoginForm() {
      
       // 2. Define a submit handler.
       async function onSubmit(values: LoginBodyType) {
-          const result = await fetch(
-            `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
-            {
-              body: JSON.stringify(values),
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              method: 'POST'
+          try{
+            const result = await fetch(
+              `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
+              {
+                body: JSON.stringify(values),
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                method: 'POST'
+              }
+            ).then(async (res) => {
+              const payload = await res.json()
+              const data = {
+                status: res.status,
+                payload
+              }
+              if(!res.ok) throw data
+              return data
+            })
+          } catch (error) {
+            const errors = (error as any).payload.errors as {field: "email" | "password", message: string}[]
+            const status = (error as any).status as number
+
+            if(status !== 422) {
+              errors.forEach((error) =>
+                form.setError(error.field, {
+                  type: 'server',
+                  message: error.message
+                })
+              )
+            } else {
+              toast({
+                title: "Error to login",
+                description: (error as any).payload.message
+              })
             }
-          ).then(res => res.json())
-          console.log('>>>>',result)
+          }
       }
       return (
         <Form {...form}>
