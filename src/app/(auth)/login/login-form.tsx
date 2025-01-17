@@ -12,26 +12,24 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
+import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import envConfig from "@/config"
 
  
 
-export default function RegisterForm() {
-    const form = useForm<RegisterBodyType>({
-        resolver: zodResolver(RegisterBody),
+export default function LoginForm() {
+    const form = useForm<LoginBodyType>({
+        resolver: zodResolver(LoginBody),
         defaultValues: {
           email: '',
-          name: '',
           password: '',
-          confirmPassword: ''
         },
       })
      
       // 2. Define a submit handler.
-      async function onSubmit(values: RegisterBodyType) {
+      async function onSubmit(values: LoginBodyType) {
           const result = await fetch(
-            `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
+            `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
             {
               body: JSON.stringify(values),
               headers: {
@@ -45,19 +43,6 @@ export default function RegisterForm() {
       return (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-[600px] w-full" noValidate>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter the name" {...field} />
-                  </FormControl> 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="email"
@@ -83,21 +68,8 @@ export default function RegisterForm() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
-                        <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Re-enter the password" type='password' {...field} />
-                  </FormControl> 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="!mt-6 w-full">Register</Button>
+            /> 
+            <Button type="submit" className="!mt-6 w-full">Login</Button>
           </form>
         </Form>
       )
