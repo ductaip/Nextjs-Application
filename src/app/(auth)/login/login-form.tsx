@@ -17,6 +17,14 @@ import envConfig from "@/config"
 import { useToast } from "@/hooks/use-toast"
  
 
+interface ErrorResponse {
+  status: number;
+  payload: {
+    message: string;
+    errors: { field: "email" | "password"; message: string }[];
+  };
+};
+
 export default function LoginForm() {
     const { toast } = useToast()
     const form = useForm<LoginBodyType>({
@@ -48,9 +56,15 @@ export default function LoginForm() {
               if(!res.ok) throw data
               return data
             })
+            toast({
+              description: result.payload.message
+            })
+
+            console.log(result.payload)
+            
           } catch (error) {
-            const errors = (error as any).payload.errors as {field: "email" | "password", message: string}[]
-            const status = (error as any).status as number
+            const errors = (error as ErrorResponse).payload.errors;
+            const status = (error as ErrorResponse).status as number
 
             if(status !== 422) {
               errors.forEach((error) =>
@@ -61,8 +75,9 @@ export default function LoginForm() {
               )
             } else {
               toast({
+                variant: 'destructive',
                 title: "Error to login",
-                description: (error as any).payload.message
+                description: (error as ErrorResponse).payload.message
               })
             }
           }
