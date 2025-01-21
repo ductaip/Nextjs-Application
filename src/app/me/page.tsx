@@ -1,10 +1,11 @@
 import envConfig from "@/config"
 import { cookies } from 'next/headers'
+import Profile from "./profile"
 
-export default async function Profile() {
+export default async function Me() {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('sessionToken')
-  console.log('session', sessionToken)
+   
   const result = await fetch(`${envConfig.NEXT_PUBLIC_API_ENDPOINT}/account/me`,
     { 
       headers: {
@@ -21,10 +22,11 @@ export default async function Profile() {
     if(!res.ok) throw data
     else return data
   })
-  console.log('result',result)
+  
   return (
     <div>
-      My profile - {result.payload.data.name}
+      Me - {result.payload.data.name}
+      <Profile />
     </div>
   )
 }

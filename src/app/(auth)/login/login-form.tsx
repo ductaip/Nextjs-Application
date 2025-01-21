@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import envConfig from "@/config"
 import { useToast } from "@/hooks/use-toast"
+import { useAppContext } from "@/app/AppProvider"
  
  
 
 export default function LoginForm() {
     const { toast } = useToast()
+    const { setSessionToken } = useAppContext()
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
         defaultValues: {
@@ -69,7 +71,8 @@ export default function LoginForm() {
               if(!res.ok) throw data
               return data
             })
-            console.log('check',resultFromNextServer)
+            setSessionToken(resultFromNextServer.payload.data.token)
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error : any) {
             const errors = error.payload.errors as {

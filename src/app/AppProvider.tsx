@@ -1,7 +1,9 @@
+'use client'
 import React, { ReactNode, createContext, useContext, useState } from "react";
 
 interface AppProviderProps {
-    children: ReactNode;
+    children: ReactNode
+    initialSessionToken: string
 }
 
 interface AppContextProps {
@@ -20,8 +22,8 @@ export const useAppContext = () : AppContextProps => {
     return context
 }
 
-const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const [sessionToken, setSessionToken] = useState('')
+const AppProvider: React.FC<AppProviderProps> = ({ children, initialSessionToken }) => {
+    const [sessionToken, setSessionToken] = useState(initialSessionToken)
 
     return (
         <AppContext.Provider value={{ sessionToken, setSessionToken }}>
