@@ -54,7 +54,7 @@ export default function LoginForm() {
               description: result.payload.message
             })
 
-            const resultFromNextServer = await fetch('/api/auth', {
+            const resultFromNextServer = await fetch(`/api/auth`, {
               method: 'POST',
               body: JSON.stringify(result),
               headers: {
@@ -86,6 +86,7 @@ export default function LoginForm() {
                 })
               )
             } else {
+              console.log(error)
               toast({
                 variant: 'destructive',
                 title: "Error to login",
