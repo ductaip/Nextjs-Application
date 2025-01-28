@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import envConfig from "@/config"
 
 type CustomOptions = RequestInit & {
@@ -41,3 +43,23 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
     if(!res.ok) throw new HttpError(data)
     return data
 }
+
+const http = {
+    get<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
+        return request<Response>('GET', url, options)
+    },
+
+    post<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+        return request<Response>('POST', url, {...options, body})
+    },
+
+    put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'>| undefined) {
+        return request<Response>('PUT', url, {...options, body})
+    },
+
+    delete<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+        return request<Response>('DELETE', url, {...options, body})
+    }
+}
+
+export default http
