@@ -16,6 +16,7 @@ import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import envConfig from "@/config"
 import { useToast } from "@/hooks/use-toast"
 import { useAppContext } from "@/app/AppProvider"
+import authApi from "@/apis/auth"
  
  
 
@@ -33,24 +34,7 @@ export default function LoginForm() {
       // 2. Define a submit handler.
       async function onSubmit(values: LoginBodyType) {
           try{
-            const result = await fetch(
-              `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
-              {
-                body: JSON.stringify(values),
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                method: 'POST'
-              }
-            ).then(async (res) => {
-              const payload = await res.json()
-              const data = {
-                status: res.status,
-                payload
-              }
-              if(!res.ok) throw data
-              return data
-            })
+            const result = await authApi.login(values)
 
             toast({
               description: result.payload.message
