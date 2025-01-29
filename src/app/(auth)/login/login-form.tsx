@@ -13,14 +13,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
-import envConfig from "@/config"
 import { useToast } from "@/hooks/use-toast"
 import { useAppContext } from "@/app/AppProvider"
 import authApi from "@/apis/auth"
+import { useRouter } from "next/navigation"
  
  
 
 export default function LoginForm() {
+    const router = useRouter()
     const { toast } = useToast()
     const { setSessionToken } = useAppContext()
     const form = useForm<LoginBodyType>({
@@ -40,22 +41,10 @@ export default function LoginForm() {
               description: result.payload.message
             })
 
-            const resultFromNextServer = await fetch(`/api/auth`, {
-              method: 'POST',
-              body: JSON.stringify(result),
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            }).then(async (res) => {
-              const payload = await res.json()
-              const data = {
-                status: res.status,
-                payload
-              }
-              if(!res.ok) throw data
-              return data
-            })
-            setSessionToken(resultFromNextServer.payload.data.token)
+            await authApi.auth({sessionToken: result.payload.data.token})
+
+            setSessionToken(result.payload.data.token)
+            router.push('/me')
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error : any) {
