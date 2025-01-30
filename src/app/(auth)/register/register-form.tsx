@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
-import envConfig from "@/config"
+import authApi from "@/apis/auth"
 
  
 
@@ -30,18 +30,11 @@ export default function RegisterForm() {
      
       // 2. Define a submit handler.
       async function onSubmit(values: RegisterBodyType) {
-          const result = await fetch(
-            `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
-            {
-              body: JSON.stringify(values),
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              method: 'POST'
-            }
-          ).then(res => res.json())
+          const result = await authApi.register(values)
           console.log('>>>>',result)
       }
+
+
       return (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-[600px] w-full" noValidate>
