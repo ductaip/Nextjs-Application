@@ -14,10 +14,16 @@ import {
 import { Input } from "@/components/ui/input"
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
 import authApi from "@/apis/auth"
+import { toast } from "@/hooks/use-toast"
+import { useAppContext } from "@/app/AppProvider"
+import { useRouter } from "next/navigation"
 
  
 
 export default function RegisterForm() {
+    const { setSessionToken } = useAppContext()
+      const router = useRouter()
+  
     const form = useForm<RegisterBodyType>({
         resolver: zodResolver(RegisterBody),
         defaultValues: {
@@ -30,8 +36,42 @@ export default function RegisterForm() {
      
       // 2. Define a submit handler.
       async function onSubmit(values: RegisterBodyType) {
+        try{
           const result = await authApi.register(values)
-          console.log('>>>>',result)
+
+          toast({
+            description: result.payload.message
+          })
+
+          await authApi.auth({sessionToken: result.payload.data.token})
+
+          setSessionToken(result.payload.data.token)
+          router.push('/me')
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error : any) {
+          const errors = error.payload.errors as {
+            field: string
+            message: string
+          }[]
+          const status = error.status as number
+
+          if(status !== 422 && Array.isArray(errors)) {
+            errors.forEach((error) =>
+              form.setError(error.field as 'email' | 'password' | 'name', {
+                type: 'server',
+                message: error.message
+              })
+            )
+          } else {
+            console.log(error)
+            toast({
+              variant: 'destructive',
+              title: "Error to register",
+              description: error.payload.message
+            })
+          }
+        }
       }
 
 

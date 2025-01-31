@@ -16,6 +16,23 @@ class HttpError extends Error {
     }
 }
 
+class SessionToken {
+    private token = ''
+    get value() {
+        return this.token
+    }
+
+    set value(token: string) {
+        //ko the goi o server component
+        if(typeof window === 'undefined') {
+            throw new Error('Cannot set token on server side')
+        }
+        this.token = token
+    }
+}
+
+export const sessionToken = new SessionToken()
+
 const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions | undefined) => {
     const body = options?.body ? JSON.stringify(options.body) : undefined
     const baseHeaders = {

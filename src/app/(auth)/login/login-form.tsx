@@ -13,16 +13,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
-import { useToast } from "@/hooks/use-toast"
 import { useAppContext } from "@/app/AppProvider"
 import authApi from "@/apis/auth"
 import { useRouter } from "next/navigation"
+import { toast } from "@/hooks/use-toast"
  
  
 
 export default function LoginForm() {
     const router = useRouter()
-    const { toast } = useToast()
     const { setSessionToken } = useAppContext()
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
