@@ -1,35 +1,18 @@
 'use client'
-import React, { ReactNode, createContext, useContext, useState } from "react";
+import { clientSessionToken } from "@/lib/http";
+import React, { Fragment, useState } from "react";
+  
+ 
 
-interface AppProviderProps {
-    children: ReactNode
-    initialSessionToken: string
-}
+function AppProvider ({ children, initialSessionToken = '' }: {
+    children: React.ReactNode
+    initialSessionToken?: string
+}) {
+    useState(() => {
+        clientSessionToken.value = initialSessionToken
+    })
 
-interface AppContextProps {
-    sessionToken: string
-    setSessionToken: React.Dispatch<React.SetStateAction<string>>
-}
-
-const AppContext = createContext<AppContextProps>({
-    sessionToken: '',
-    setSessionToken: () => {}
-})
-
-export const useAppContext = () : AppContextProps => {
-    const context = useContext(AppContext)
-    if (!context) throw new Error('AppContext must be used within an AppProvider')
-    return context
-}
-
-const AppProvider: React.FC<AppProviderProps> = ({ children, initialSessionToken }) => {
-    const [sessionToken, setSessionToken] = useState(initialSessionToken)
-
-    return (
-        <AppContext.Provider value={{ sessionToken, setSessionToken }}>
-            {children}
-        </AppContext.Provider>
-    )
+    return <Fragment> {children} </Fragment>
 }
 
 export default AppProvider

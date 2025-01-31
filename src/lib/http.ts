@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import envConfig from "@/config"
+import { LoginResType } from "@/schemaValidations/auth.schema"
 
 type CustomOptions = RequestInit & {
     baseUrl?: string | undefined
@@ -25,18 +26,19 @@ class SessionToken {
     set value(token: string) {
         //ko the goi o server component
         if(typeof window === 'undefined') {
-            throw new Error('Cannot set token on server side')
+            console.warn('Cannot set token on server side')
         }
         this.token = token
     }
 }
 
-export const sessionToken = new SessionToken()
+export const clientSessionToken = new SessionToken()
 
 const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions | undefined) => {
     const body = options?.body ? JSON.stringify(options.body) : undefined
     const baseHeaders = {
-        'Content-Type' : 'application/json'
+        'Content-Type' : 'application/json',
+        Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : ''
     }
     const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl
 
@@ -57,7 +59,18 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
         status: res.status,
         payload
     }
+
     if(!res.ok) throw new HttpError(data)
+    
+    const check = ['/auth/register', '/auth/login'].some(path => path.includes(url))
+    const checkLogout = ['/auth/logout'].some(path => path.includes(url))
+
+    if(check) {
+        clientSessionToken.value = (payload as LoginResType).data.token
+    } else if(checkLogout) {
+        clientSessionToken.value = ''
+    }
+
     return data
 }
 

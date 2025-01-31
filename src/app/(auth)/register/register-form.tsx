@@ -15,13 +15,12 @@ import { Input } from "@/components/ui/input"
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
 import authApi from "@/apis/auth"
 import { toast } from "@/hooks/use-toast"
-import { useAppContext } from "@/app/AppProvider"
 import { useRouter } from "next/navigation"
+import { clientSessionToken } from "@/lib/http"
 
  
 
 export default function RegisterForm() {
-    const { setSessionToken } = useAppContext()
       const router = useRouter()
   
     const form = useForm<RegisterBodyType>({
@@ -45,7 +44,7 @@ export default function RegisterForm() {
 
           await authApi.auth({sessionToken: result.payload.data.token})
 
-          setSessionToken(result.payload.data.token)
+          clientSessionToken.value = result.payload.data.token
           router.push('/me')
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
-import { useAppContext } from "@/app/AppProvider"
 import authApi from "@/apis/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
+import { clientSessionToken } from "@/lib/http"
  
  
 
 export default function LoginForm() {
     const router = useRouter()
-    const { setSessionToken } = useAppContext()
+
     const form = useForm<LoginBodyType>({
         resolver: zodResolver(LoginBody),
         defaultValues: {
@@ -42,7 +42,7 @@ export default function LoginForm() {
 
             await authApi.auth({sessionToken: result.payload.data.token})
 
-            setSessionToken(result.payload.data.token)
+            clientSessionToken.value = result.payload.data.token
             router.push('/me')
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
