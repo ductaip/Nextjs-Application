@@ -17,10 +17,13 @@ import authApi from "@/apis/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
 import { clientSessionToken } from "@/lib/http"
+import { handleErrorApi } from "@/lib/utils"
+import { useState } from "react"
  
  
 
 export default function LoginForm() {
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
 
     const form = useForm<LoginBodyType>({
@@ -33,6 +36,8 @@ export default function LoginForm() {
      
       // 2. Define a submit handler.
       async function onSubmit(values: LoginBodyType) {
+          if(loading) return
+          setLoading(true)
           try{
             const result = await authApi.login(values)
 
@@ -47,27 +52,9 @@ export default function LoginForm() {
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error : any) {
-            const errors = error.payload.errors as {
-              field: string
-              message: string
-            }[]
-            const status = error.status as number
-
-            if(status !== 422 && Array.isArray(errors)) {
-              errors.forEach((error) =>
-                form.setError(error.field as 'email' | 'password', {
-                  type: 'server',
-                  message: error.message
-                })
-              )
-            } else {
-              console.log(error)
-              toast({
-                variant: 'destructive',
-                title: "Error to login",
-                description: error.payload.message
-              })
-            }
+            handleErrorApi({error, setError: form.setError})
+          } finally {
+            setLoading(false)
           }
       }
 

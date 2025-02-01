@@ -17,12 +17,15 @@ import authApi from "@/apis/auth"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { clientSessionToken } from "@/lib/http"
+import { handleErrorApi } from "@/lib/utils"
+import { useState } from "react"
 
  
 
 export default function RegisterForm() {
-      const router = useRouter()
-  
+    const [loading, setLoading] = useState(false)
+    const router = useRouter()
+
     const form = useForm<RegisterBodyType>({
         resolver: zodResolver(RegisterBody),
         defaultValues: {
@@ -35,6 +38,8 @@ export default function RegisterForm() {
      
       // 2. Define a submit handler.
       async function onSubmit(values: RegisterBodyType) {
+        if(loading) return
+        setLoading(true)
         try{
           const result = await authApi.register(values)
 
@@ -49,31 +54,13 @@ export default function RegisterForm() {
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error : any) {
-          const errors = error.payload.errors as {
-            field: string
-            message: string
-          }[]
-          const status = error.status as number
-
-          if(status !== 422 && Array.isArray(errors)) {
-            errors.forEach((error) =>
-              form.setError(error.field as 'email' | 'password' | 'name', {
-                type: 'server',
-                message: error.message
-              })
-            )
-          } else {
-            console.log(error)
-            toast({
-              variant: 'destructive',
-              title: "Error to register",
-              description: error.payload.message
-            })
-          }
+            handleErrorApi({error, setError: form.setError})
+        } finally {
+          setLoading(false)
         }
       }
 
-
+      
       return (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 max-w-[600px] w-full" noValidate>
