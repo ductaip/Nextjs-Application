@@ -9,7 +9,8 @@ function AppProvider ({ children, initialSessionToken = '' }: {
     initialSessionToken?: string
 }) {
     useState(() => {
-        clientSessionToken.value = initialSessionToken
+        if(typeof window !== 'undefined')
+            clientSessionToken.value = initialSessionToken
     })
 
     return <Fragment> {children} </Fragment>

@@ -2,13 +2,12 @@
 
 import { useEffect } from "react"
 import accountApi from "@/apis/account"
-import { clientSessionToken } from "@/lib/http"
 
 export default function Profile() {
 
     useEffect(() => {
         const fetchRequest = async () => {
-            const result = await accountApi.me(clientSessionToken.value)
+            const result = await accountApi.me()
             console.log('***', result)
         }
         fetchRequest()

@@ -3,7 +3,7 @@
 import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
 
-type CustomOptions = RequestInit & {
+type CustomOptions = Omit<RequestInit, 'method'> & {
     baseUrl?: string | undefined
 }
 
@@ -26,7 +26,7 @@ class SessionToken {
     set value(token: string) {
         //ko the goi o server component
         if(typeof window === 'undefined') {
-            console.warn('Cannot set token on server side')
+            throw new Error('Cannot set token on server component')
         }
         this.token = token
     }
