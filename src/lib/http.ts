@@ -17,7 +17,7 @@ type EntityErrorPayload = {
     }[]
 }
 
-class HttpError extends Error {
+export class HttpError extends Error {
     status: number
     payload: {
         message: string

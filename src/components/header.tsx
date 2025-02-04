@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
+import ButtonLogout from "./button-logout";
 
 export default function Header() {
   return (
@@ -12,6 +13,7 @@ export default function Header() {
             <Button>
                 <Link href='/register'>Register</Link>
             </Button>
+            <ButtonLogout />
           </div>
         <ModeToggle />
         header...
