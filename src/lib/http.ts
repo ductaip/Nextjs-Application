@@ -94,13 +94,15 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
         }
     }
     
-    const check = ['/auth/register', '/auth/login'].some(path => path.includes(url))
-    const checkLogout = ['/auth/logout'].some(path => path.includes(url))
+    if(typeof window !== 'undefined') {
+        const check = ['/auth/register', '/auth/login'].some(path => path.startsWith(url))
+        const checkLogout = ['/auth/logout'].some(path => path.startsWith(url))
 
-    if(check) {
-        clientSessionToken.value = (payload as LoginResType).data.token
-    } else if(checkLogout) {
-        clientSessionToken.value = ''
+        if(check) {
+            clientSessionToken.value = (payload as LoginResType).data.token
+        } else if(checkLogout) {
+            clientSessionToken.value = ''
+        }
     }
 
     return data
