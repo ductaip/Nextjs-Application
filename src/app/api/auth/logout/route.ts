@@ -6,6 +6,20 @@ import { cookies } from "next/headers"
 //server component
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function POST(request: Request) {
+    const res = await request.json()
+    const force = res.force as boolean | undefined
+    
+    if(force) {
+        return Response.json({ 
+            message: 'Logout cause token is expired'
+            }
+            , {
+            status: 200,
+            headers: {
+                'Set-Cookie': `sessionToken=; Path=/; HttpOnly`
+            }
+        })
+    }
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('sessionToken')
 
