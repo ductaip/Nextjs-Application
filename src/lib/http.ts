@@ -2,6 +2,7 @@
 
 import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
+import { redirect } from "next/navigation"
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
     baseUrl?: string | undefined
@@ -57,8 +58,10 @@ class SessionToken {
 }
 
 export const clientSessionToken = new SessionToken()
+let clientLogoutRequest: null | Promise<any> = null
 
 const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions | undefined) => {
+
     const body = options?.body ? JSON.stringify(options.body) : undefined
     const baseHeaders = {
         'Content-Type' : 'application/json',
@@ -93,15 +96,24 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
             //handle 401 token is expired
         } else if(res.status === AUTHENTICATION_ERROR_STATUS) {
             if(typeof window !== 'undefined') {
-                await fetch('/api/auth/logout', {
-                    method: 'POST',
-                    body: JSON.stringify({ force: true }),
-                    headers: {
-                        
-                    }
-                })
-                clientSessionToken.value = ''
-                location.href = '/login'
+                if(!clientLogoutRequest) {
+                    clientLogoutRequest = fetch('/api/auth/logout', {
+                        method: 'POST',
+                        body: JSON.stringify({ force: true }),
+                        headers: {
+                            
+                        }
+                    })
+
+                    await clientLogoutRequest
+                    
+                    clientSessionToken.value = ''
+                    clientLogoutRequest = null
+                    location.href = '/login'
+                }
+            } else {
+                const sessionToken = (options?.headers as any)?.Authorization.split(' ')[1]
+                redirect(`/logout?sessionToken=${sessionToken}`)
             }
         } else {
             throw new HttpError(data)

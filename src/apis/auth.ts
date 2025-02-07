@@ -13,7 +13,7 @@ const authApi = {
             Authorization: `Bearer ${sessionToken}`
         }
     }),
-    logoutFromNextClientToNextServer: () => http.post<MessageResType>('/api/auth/logout', {}, {
+    logoutFromNextClientToNextServer: (force?: boolean | undefined) => http.post<MessageResType>('/api/auth/logout', {force}, {
         baseUrl: ''
     })
 }
