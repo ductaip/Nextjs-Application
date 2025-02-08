@@ -3,7 +3,11 @@ import { CreateProductBodyType, ProductResType } from "@/schemaValidations/produ
 
 const productApiRequest = {
     get: () => http.get('products'),
-    create: (body: CreateProductBodyType) => http.post<ProductResType>('/product', body)
+    create: (body: CreateProductBodyType) => http.post<ProductResType>('/products', body),
+    uploadImage: (body: FormData) => http.post<{
+        message: string,
+        data: string
+    }> ('/media/upload', body)
 
 }
 

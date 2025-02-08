@@ -62,9 +62,17 @@ let clientLogoutRequest: null | Promise<any> = null
 
 const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions | undefined) => {
 
-    const body = options?.body ? JSON.stringify(options.body) : undefined
-    const baseHeaders = {
-        'Content-Type' : 'application/json',
+    const body = options?.body 
+    ? options.body instanceof FormData 
+     ? options.body 
+     : JSON.stringify(options.body) 
+    : undefined
+    const baseHeaders: HeadersInit | undefined = body instanceof FormData 
+    ? {    
+        Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : ''
+    }
+    : {
+        'Content-Type': 'application/json',
         Authorization: clientSessionToken.value ? `Bearer ${clientSessionToken.value}` : ''
     }
     const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl

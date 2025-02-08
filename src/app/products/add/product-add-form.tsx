@@ -44,13 +44,20 @@ export default function ProductAddForm() {
           if(loading) return
           setLoading(true)
           try{
-            // const result = await productApiRequest.create(values)
-            values = { ...values, price: +values.price}
+            const formData = new FormData()
+            formData.append('file', file as Blob)
+            const uploadImageResult = await productApiRequest.uploadImage(formData)
+            const imageUrl = uploadImageResult.payload.data
+
+            const result = await productApiRequest.create({
+              ...values,
+              image: imageUrl
+            })
             console.log(values)
 
-            // toast({
-            //   description: result.payload.message
-            // })
+            toast({
+              description: result.payload.message
+            })
 
 
             // router.push('/products')
@@ -117,7 +124,7 @@ export default function ProductAddForm() {
                         const file = e.target.files?.[0]
                         if(file) {
                           setFile(file)
-                          field.onChange(file.name)
+                          field.onChange('http://localhost:3000/' + file.name)
                         }
                       }}
                     />
@@ -133,7 +140,7 @@ export default function ProductAddForm() {
                   width={128}
                   height={128}
                   alt='preview'
-                  className="w-32 h-32 object-cover"
+                  className="w-32 h-32 object-cover mb-4"
                 />  
                 <Button variant={'destructive'} size={'sm'}>Delete image</Button>                
               </div>
