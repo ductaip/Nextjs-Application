@@ -3,6 +3,7 @@ import { CreateProductBodyType, ProductListResType, ProductResType } from "@/sch
 
 const productApiRequest = {
     getProductList: () => http.get<ProductListResType>('products'),
+    getDetail: (id: number) => http.get<ProductResType>(`/products/${id}`),
     create: (body: CreateProductBodyType) => http.post<ProductResType>('/products', body),
     uploadImage: (body: FormData) => http.post<{
         message: string,

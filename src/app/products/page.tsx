@@ -1,6 +1,7 @@
 import productApiRequest from "@/apis/product"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link"
 
 export default async function ProductListPage() {
   const {payload} = await productApiRequest.getProductList()
@@ -9,6 +10,7 @@ export default async function ProductListPage() {
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold text-center mb-6">Product List</h1>
+      <Link className="inline-flex mb-8 p-4 py-3 bg-neutral-700 rounded-lg" href={"/products/add"}>Add product</Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {productList.map((product) => (
           <div
@@ -29,7 +31,7 @@ export default async function ProductListPage() {
               {product.description || 'No description available'}
             </p>
             <div className="flex space-x-2">
-              <Button variant={"outline"}>Edit</Button>
+              <Link href={`/products/${product.id}`}><Button variant={"outline"}>Edit</Button></Link>
               <Button variant={"destructive"}>Delete</Button>
             </div>
           </div>

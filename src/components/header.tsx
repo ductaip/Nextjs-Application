@@ -8,7 +8,7 @@ export default function Header() {
     <div className="">
           <div className="flex gap-4 my-6">
           <Button>
-                <Link href='/products/add'>Add product</Link>
+                <Link href='/products'>Products</Link>
             </Button>
             <Button>
                 <Link href='/login'>Login</Link>
