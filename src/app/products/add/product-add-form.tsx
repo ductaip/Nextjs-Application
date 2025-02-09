@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client" 
 
@@ -120,6 +121,7 @@ export default function ProductAddForm() {
                   <FormLabel>Image</FormLabel>
                   <FormControl>
                     <Input type='file' accept="image/*" 
+                      onClick={(e: any) => e.target.value = null}
                       onChange={(e) => {
                         const file = e.target.files?.[0]
                         if(file) {
@@ -142,7 +144,12 @@ export default function ProductAddForm() {
                   alt='preview'
                   className="w-32 h-32 object-cover mb-4"
                 />  
-                <Button variant={'destructive'} size={'sm'}>Delete image</Button>                
+                <Button type='button' variant={'destructive'} size={'sm'}
+                  onClick={() => {
+                    setFile(null)
+                    form.setValue('image', '')
+                  }}
+                >Delete image</Button>                
               </div>
             )}
 
