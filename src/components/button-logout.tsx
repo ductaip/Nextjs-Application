@@ -15,7 +15,7 @@ export default function ButtonLogout() {
             const result = await authApi.logoutFromNextClientToNextServer();
             toast({title: 'Logout Success', description: 'You have successfully logout'})
             router.push('/login')
-
+            router.refresh()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             handleErrorApi({error})
