@@ -1,5 +1,5 @@
 import React from 'react'
-import ProductAddForm from './product-add-form'
+import ProductAddForm from '../../../components/ProductForm/product-add-form'
 
 export default function ProductAddPage() {
   return (

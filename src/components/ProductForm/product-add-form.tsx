@@ -18,14 +18,14 @@ import { useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
 import { handleErrorApi } from "@/lib/utils"
 import { useState } from "react"
-import { CreateProductBody, CreateProductBodyType } from "@/schemaValidations/product.schema"
+import { CreateProductBody, CreateProductBodyType, ProductResType, UpdateProductBodyType } from "@/schemaValidations/product.schema"
 import productApiRequest from "@/apis/product"
 import { Textarea } from "@/components/ui/textarea"
 import Image from "next/image"
  
- 
+type Product = ProductResType['data']
 
-export default function ProductAddForm() {
+export default function ProductAddForm({product}: {product?: Product}) {
     const [file, setFile] = useState<File | null>(null)
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -33,35 +33,36 @@ export default function ProductAddForm() {
     const form = useForm<CreateProductBodyType>({
         resolver: zodResolver(CreateProductBody),
         defaultValues: {
-          name: '',
-          price: 0,
-          description: '',
-          image: ''
+          name: product?.name ?? '',
+          price: product?.price ?? 0,
+          description: product?.description ?? '',
+          image: product?.image ?? ''
         },
       })
-     
-      // 2. Define a submit handler.
-      async function onSubmit(values: CreateProductBodyType) {
-          if(loading) return
-          setLoading(true)
+
+      const image = form.watch('image')
+      
+      const createProduct = async (values: CreateProductBodyType) => {
+        setLoading(true)
           try{
             const formData = new FormData()
             formData.append('file', file as Blob)
             const uploadImageResult = await productApiRequest.uploadImage(formData)
             const imageUrl = uploadImageResult.payload.data
 
-            const result = await productApiRequest.create({
+            const result = await productApiRequest.createProduct({
               ...values,
               image: imageUrl
             })
             console.log(values)
 
             toast({
-              description: result.payload.message
+              description: result.payload.message,
+              duration: 2000
             })
 
 
-            // router.push('/products')
+            router.push('/products')
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error : any) {
@@ -69,6 +70,49 @@ export default function ProductAddForm() {
           } finally {
             setLoading(false)
           }
+      }
+
+      const updateProduct = async (_values: UpdateProductBodyType) => {
+          if(!product) return
+          setLoading(true)
+          let values = _values
+          try{
+            if(file) {
+              const formData = new FormData()
+              formData.append('file', file as Blob)
+              const uploadImageResult = await productApiRequest.uploadImage(formData)
+              const imageUrl = uploadImageResult.payload.data
+              values = {
+                ...values,
+                image: imageUrl
+              }
+            }
+
+            const result = await productApiRequest.updateProduct(product.id, values)
+            console.log(values)
+
+            toast({
+              description: result.payload.message,
+              duration: 2000
+            })
+
+
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (error : any) {
+            handleErrorApi({error, setError: form.setError})
+          } finally {
+            setLoading(false)
+          }
+      }
+
+      // 2. Define a submit handler.
+      async function onSubmit(values: CreateProductBodyType) {
+          if(loading) return
+
+          if(!product) await createProduct(values)
+          else await updateProduct(values)
+          
       }
 
       return (
@@ -135,10 +179,11 @@ export default function ProductAddForm() {
                 </FormItem>
               )}
             /> 
-            {file && (
+            {(file || image) && (
               <div>
                 <Image
-                  src={URL.createObjectURL(file)}
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+                  src={file ? URL.createObjectURL(file) : image}
                   width={128}
                   height={128}
                   alt='preview'
@@ -153,7 +198,7 @@ export default function ProductAddForm() {
               </div>
             )}
 
-            <Button type="submit" className="!mt-6 w-full">Create</Button>
+            <Button type="submit" className="!mt-6 w-full">{product ? "Edit" : "Create"}</Button>
           </form>
         </Form>
       )
