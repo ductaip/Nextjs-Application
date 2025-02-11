@@ -2,18 +2,14 @@ import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 import { Button } from "./ui/button";
 import ButtonLogout from "./button-logout";
-import { cookies } from "next/headers";
 import { Fragment } from "react";
-import accountApi from "@/apis/account";
+import { AccountResType } from "@/schemaValidations/account.schema";
 
-export default async function Header() {
-  const cookieStore = await cookies()
-  const sessionToken = cookieStore.get('sessionToken')?.value
-  let user = null
-  if(sessionToken) {
-    const data = await accountApi.MeFromServer(sessionToken)
-    user = data.payload.data    
-  }
+export default async function Header({
+  user
+}: {
+  user: AccountResType['data'] | null
+}) { 
 
   return (
     <div className="">
@@ -25,7 +21,7 @@ export default async function Header() {
             <Button>
               <Link href='/products'>Products</Link>
             </Button>
-            {sessionToken 
+            {user 
             ? <ButtonLogout />
             : <Fragment>
                 <Button>
